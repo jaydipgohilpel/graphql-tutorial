@@ -4,6 +4,8 @@ const { expressMiddleware } = require('@apollo/server/express4')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { default: axios } = require('axios');
+const { Todo } = require('./data/todo')
+const { User } = require('./data/user')
 
 
 async function startServer() {
@@ -34,12 +36,12 @@ async function startServer() {
     `,
     resolvers: {
       Todo: {
-        user: async (todo) => (await axios.get(`https://jsonplaceholder.typicode.com/users/${todo.id}`)).data,
+        user: (todo) => User.find((t) => t.id === todo.id),
       },
       Query: {
-        getTodos: async () => (await axios.get('https://jsonplaceholder.typicode.com/todos/')).data,
-        getAllUser: async () => (await axios.get('https://jsonplaceholder.typicode.com/users/')).data,
-        getUser: async (parent, { id }) => (await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`)).data,
+        getTodos: () => Todo,
+        getAllUser: () => User,
+        getUser: (parent, { id }) => User.find((user) => user.id === id),
       }
     }
   })
